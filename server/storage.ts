@@ -1,10 +1,10 @@
 import { users, type User, type InsertUser, drawings, type Drawing, type InsertDrawing } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
 import connectPg from "connect-pg-simple";
 import session from "express-session";
 import { Store } from 'express-session';
+import { db } from './db';
+import { Pool } from 'pg';
 
 // Storage interface
 export interface IStorage {
@@ -23,10 +23,11 @@ export interface IStorage {
   sessionStore: Store;
 }
 
-// Database configuration
-const connectionString = process.env.DATABASE_URL!;
-const queryClient = postgres(connectionString);
-const db = drizzle(queryClient);
+// Tạo PostgreSQL connection pool cho session store
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
 // PostgreSQL storage implementation
 export class DatabaseStorage implements IStorage {
@@ -35,7 +36,7 @@ export class DatabaseStorage implements IStorage {
   constructor() {
     const PostgresStore = connectPg(session);
     this.sessionStore = new PostgresStore({
-      conString: connectionString,
+      pool: pool,
       createTableIfMissing: true,
     });
   }
