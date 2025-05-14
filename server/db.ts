@@ -10,7 +10,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 // Tạo pool connection
-const pool = new Pool({
+export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });

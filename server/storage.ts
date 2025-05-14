@@ -23,11 +23,8 @@ export interface IStorage {
   sessionStore: Store;
 }
 
-// Tạo PostgreSQL connection pool cho session store
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
+// Sử dụng lại pool từ db.ts
+import { pool } from './db';
 
 // PostgreSQL storage implementation
 export class DatabaseStorage implements IStorage {
